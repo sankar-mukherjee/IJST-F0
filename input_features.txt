@@ -1,0 +1,14 @@
+no of syllable	[10]
+phoneme identity previous, current, next  46 * 3 = [138]
+phoneme position in syllable forward and backward 6 * 2 = [12]
+syllable position in a word 10 * 2 = [20]
+no of phoneme in syllable 6 * 3 = [18]
+vowel position (forward) in syllable 6 * 1 = [6]
+vowel identity 			[16]
+
+
+
+_______________________________________________________________________[220]
+
+
+ 

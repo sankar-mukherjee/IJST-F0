@@ -1,0 +1,39 @@
+function dbn = dbn(size)
+load('../data/input.mat');load('../data/f0.mat');
+
+train_x = input(1:end,:);
+% train_y = f0(1:end,:) / 399.9851;
+
+n_train = ceil(size * 3 / 4);
+n_valid = floor(size /4);
+
+train_xx = input(1:n_train,:);
+train_yy = f0(1:n_train,:) / 399.9851;
+
+val_x = input(n_train:n_train+n_valid,:);
+val_y = f0(n_train:n_train+n_valid,:)/ 399.9851;
+test_x = input(1001:1200,:);
+test_y  = f0(1001:1200,:) / 399.9851;
+
+
+%%  ex1 train a 100 hidden unit RBM and visualize its weights
+rng(0);
+dbn.sizes = [256 256 256];
+opts.numepochs =   10;
+opts.batchsize = 100;
+opts.momentum  =   0;
+opts.alpha     =   1;
+dbn = dbnsetup(dbn, train_x, opts);
+dbn = dbntrain(dbn, train_x, opts);
+% plot(dbn.rbm{2}.W(randi([1 50],1,1),:)); randi([1 50],1,1); %Visualize the RBM weights
+
+%unfold dbn to nn
+nn = dbnunfoldtonn(dbn, 3);
+nn.activation_function = 'sigm';
+nn.output = 'linear';
+%train nn
+opts.numepochs = 10;
+opts.batchsize = 100;
+nn = nntrain(nn, train_xx, train_yy, opts,val_x,val_y);
+
+dbn = nn;

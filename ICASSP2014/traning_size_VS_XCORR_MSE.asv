@@ -1,0 +1,35 @@
+%%for ICASSP-2014 traning_labelled_data VS XCORR and RMSE
+
+load('data/sen_index.mat');load('data/input.mat');load('data/f0.mat');
+for ii=1:10
+   traning_size = floor(460246*(ii/100)) 
+   nn = dbn(traning_size);
+   TGP = TGP(traning_size);
+   XCOR=[];   MSE = [];
+   for s=1:500       
+       sen_i = 9200+s;
+       sen_dur = sen_index(sen_i:sen_i+1,1);       
+       sen_dur(2) = sen_dur(2)-1;
+       input_text=input(sen_dur(1):sen_dur(2),:);     
+       target_f0 = [];
+       
+       for i=1:size(input_text,1)
+           train_nn = [1 input_text(i,:)];
+           train_nn = sigm(train_nn * nn.W{1,1}');
+           train_nn = [1 train_nn];
+           train_nn = sigm(train_nn * nn.W{1,2}');
+           train_nn = [1 train_nn];
+           train_nn_x(i,:) = sigm(train_nn * nn.W{1,3}');
+       end
+              
+       predicted_f0 = TGPTest(test_nn_x, train_nn_x, train_y, Param, InvIK, InvOK);
+       %%
+       target_f0 = target_f0.*399.9851;                   %predicted F0
+       original_f0 = f0(sen_dur(1):sen_dur(2),:);          %original F0
+       p = reshape(target_f0',1,[]);
+       o = reshape(original_f0',1,[]);
+       
+       xcor = xcorr(o,p);       mse = rmse(o,p);
+       XCOR = [XCOR;xcor];      MSE = [MSE;mse];
+   end
+end
